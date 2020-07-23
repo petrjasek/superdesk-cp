@@ -41,14 +41,12 @@ class Orangelogic(PublishService):
         self._upload(ol, media)
 
     def _upload(self, ol, binary):
-
         folder_id = self._setup_folder(ol)
 
-        
-         params = {
-             'FolderRecordId': folder_id,
-             'FileName': 
-         }
+        params = {
+            'FolderRecordId': folder_id,
+            'FileName': binary.filename,
+        }
 
         return
 
