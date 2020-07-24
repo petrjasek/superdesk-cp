@@ -1,0 +1,51 @@
+{
+  "APIRequestInfo": {
+    "APIVersion": "V2.2",
+    "IsLoggedIn": true,
+    "Module": "DataTable",
+    "ProviderIdentity": "CP0-AWS-ORG-134",
+    "ProviderVersion": "TORONTO.R7.1528J.89859",
+    "Resource": "Documents.Folder.Default:Read",
+    "Status": "LoggedIn",
+    "TimeoutPeriodMinutes": 60,
+    "UserLogin": "superdesk_RO"
+  },
+  "RequestInterpretation": {
+    "Filters": [
+      {
+        "Field": "CoreField.Title",
+        "Operator": "=",
+        "OperatorDescription": "Field must be equal to value",
+        "Value": "AP"
+      }
+    ],
+    "IgnoredParameters": []
+  },
+  "Response": [
+    {
+      "CoreField.Color": true,
+      "CoreField.Cover-image": "2RLQZBQFZQ",
+      "CoreField.CreateDate": "2019-05-02T19:46:45",
+      "CoreField.Digitized": false,
+      "CoreField.Disabled": false,
+      "CoreField.EditDate": "2020-07-02T14:27:58",
+      "CoreField.EditLocation": "CP1",
+      "CoreField.Editor's-rating": "F",
+      "CoreField.Import-Field-Mapping-Template": "2RLQGYO_3",
+      "CoreField.Name-in-urls": "AP",
+      "CoreField.Parent-folder": "2RLQZB83CQ",
+      "CoreField.Purpose": "OR1ND000001488161",
+      "CoreField.Representative-image": "2RLQZBC3HJFV",
+      "CoreField.Show-in-the-list-of-upload-folders": false,
+      "CoreField.Title": "AP",
+      "CoreField.Type": "Story",
+      "CoreField.Unique-identifier": "CP1STO1796",
+      "RecordID": "2RLQZBQ84U"
+    }
+  ],
+  "ResponseSummary": {
+    "CurrentPage": 1,
+    "ItemsPerPage": 30,
+    "TotalItemCount": 1
+  }
+}

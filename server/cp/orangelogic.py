@@ -113,27 +113,35 @@ class OrangelogicSearchProvider(SearchProvider):
     def _url(self, path):
         return urljoin(app.config['ORANGELOGIC_URL'], path)
 
-    def _request(self, api, method='GET', **kwargs):
+    def _request(self, api, method='GET', params=None, **kwargs):
         url = self._url(api)
-        resp = self.sess.request(method, url, params=kwargs, timeout=TIMEOUT)
+        kwargs.setdefault('timeout', TIMEOUT)
+        if not params:
+            params = {}
+        params.setdefault('format', 'json')
+        resp = self.sess.request(method, url, params=params, **kwargs)
+        print('resp', json.dumps(resp.json(), indent=2) if params.get('format') == 'json' else resp.text)
         resp.raise_for_status()
         return resp
 
     def _login(self):
-        resp = self._request(AUTH_API, method='POST',
-                             Login=self.config.get('username'),
-                             Password=self.config.get('password'),
-                             format='json')
+        params = dict(
+            Login=self.config.get('username'),
+            Password=self.config.get('password'),
+        )
+        resp = self._request(AUTH_API, method='POST', params=params)
         self.token = resp.json()['APIResponse']['Token']
 
-    def _auth_request(self, api, **kwargs):
-        repeats = 2
+    def _auth_request(self, api, retry=1, params=None, **kwargs):
+        repeats = 1 + retry
         while repeats > 0:
             if not self.token:
                 self._login()
             try:
-                kwargs['token'] = self.token
-                return self._request(api, **kwargs)
+                if not params:
+                    params = {}
+                params['token'] = self.token
+                return self._request(api, params=params, **kwargs)
             except HTTPError:
                 self.token = None
                 repeats -= 1
@@ -156,7 +164,6 @@ class OrangelogicSearchProvider(SearchProvider):
             'countperpage': size,
             'fields': ','.join(self.FIELDS),
             'Sort': get_api_sort(sort),
-            'format': 'json',
             'DateFormat': 'u',
         }
 
@@ -181,7 +188,7 @@ class OrangelogicSearchProvider(SearchProvider):
                     kwargs['query'] = '{} MediaDate{}{}'.format(kwargs['query'], op, params[param]).strip()
 
         with timer('orange'):
-            resp = self._auth_request(SEARCH_API, **kwargs)
+            resp = self._auth_request(SEARCH_API, params=kwargs)
             data = resp.json()
 
         with open('/tmp/resp.json', mode='w') as out:
@@ -223,13 +230,12 @@ class OrangelogicSearchProvider(SearchProvider):
         return local_to_utc(self.TZ, local)
 
     def fetch(self, guid):
-        kwargs = {
+        params = {
             'query': 'SystemIdentifier:{}'.format(guid),
             'fields': ','.join(self.FIELDS),
-            'format': 'json',
             'DateFormat': 'u',
         }
-        resp = self._auth_request(SEARCH_API, **kwargs)
+        resp = self._auth_request(SEARCH_API, params=params)
 
         data = resp.json()
         item = self._parse_items(data)[0]
