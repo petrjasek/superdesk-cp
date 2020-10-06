@@ -6,6 +6,7 @@ from flask import current_app as app
 from urllib.parse import urljoin
 
 from apps.tasks import send_to
+from requests.api import request
 from superdesk import get_resource_service
 from superdesk.lock import lock, unlock, touch
 from superdesk.text_utils import get_text
@@ -18,6 +19,7 @@ logger = logging.getLogger(__name__)
 
 ULTRAD_ID = 'ultrad_id'
 ULTRAD_URL = 'https://pc-trad.herokuapp.com/cms/'
+ULTRAD_TRANSLATE_API = '/translate'
 ULTRAD_TIMEOUT = (5, 10)
 
 IN_PROGRESS_STATES = [
@@ -36,10 +38,24 @@ def get_headers():
     return {'x-ultrad-auth': app.config['ULTRAD_AUTH']}
 
 
+
+def translate(text):
+    if not text:
+        return ''
+    url = urljoin(ULTRAD_URL, ULTRAD_TRANSLATE_API)
+    payload = {'from': 'en', 'to': 'fr', 'text': text}
+    resp = requests.post(url, json=payload, headers=get_headers(), timeout=ULTRAD_TIMEOUT)
+    raise_for_resp_error(resp)
+    return get_json(resp)['output']
+
+
 def upload_document(item):
     item_name = item.get('headline') or item.get('slugline')
     if not item_name or not item.get('body_html'):
         return
+
+    original = get_text(item['body_html'])
+    translated = translate(original)
 
     payload = {
         'lang': {
@@ -49,7 +65,9 @@ def upload_document(item):
         'name': item_name,
         'state': 'new',
         'text': {
-            'original': get_text(item['body_html']),
+            'edited': translated,
+            'machine': translated,
+            'original': original,
         },
     }
 
