@@ -73,13 +73,6 @@ class CP_APMediaFeedParser(APMediaFeedParser):
     PROFILE_ID = 'Story'
     RELATED_ID = 'media-gallery'
 
-    RENDITIONS_MAPPING = {
-        'original': 'main',
-        'baseImage': 'main',
-        'viewImage': 'preview',
-        'thumbnail': 'thumbnail',
-    }
-
     def process_slugline(self, slugline):
         slug = re.sub(r'--+', '-', re.sub(r'[ !"#$%&()*+,./:;<=>?@[\]^_`{|}~\\]', '-', slugline))
         if slug.startswith('AP-') or slug.startswith('BC-'):
@@ -236,15 +229,15 @@ class CP_APMediaFeedParser(APMediaFeedParser):
                         item['associations'][key] = {'residRef': existing['uri'], 'guid': ''}  # set guid to KeyError
                         continue
                 if assoc.get('renditions'):
-                    for key, value in self.RENDITIONS_MAPPING.items():
-                        if value == 'main':
-                            href = assoc['renditions'].get(key, {}).get('href')
-                            if not href:  # item is set unavailable
-                                continue
-                            assoc['renditions'][key]['href'] = href + '&apikey=' + \
-                                provider.get('config', {}).get('apikey') if '?' in href else \
-                                href + '?apikey=' + provider.get('config', {}).get('apikey')
-                            item['associations'][key] = assoc
+                    for rend in assoc['renditions'].values():
+                        if not rend.get('href'):
+                            continue  # item is set unavailable
+                        rend['href'] = '{href}{join}apikey={key}'.format(
+                            href=rend['href'],
+                            join='&' if '?' in rend['href'] else '?',
+                            key=provider.get('config', {}).get('apikey'),
+                        )
+                    item['associations'][key] = assoc
 
         if item.get('pubstatus') == 'embargoed':
             item['pubstatus'] = PUB_STATUS.HOLD
