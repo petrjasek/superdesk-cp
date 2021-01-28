@@ -227,17 +227,14 @@ class CP_APMediaFeedParser(APMediaFeedParser):
                     existing = superdesk.get_resource_service('archive').find_one(req=None, ingest_id=assoc['guid'])
                     if existing:
                         item['associations'][key] = {'residRef': existing['uri'], 'guid': ''}  # set guid to KeyError
+                        print('got existing assoc {} {}'.format(assoc['guid'], assoc.get('slugline')))
                         continue
                 if assoc.get('renditions'):
                     for rend in assoc['renditions'].values():
                         if not rend.get('href'):
-                            continue  # item is set unavailable
-                        rend['href'] = '{href}{join}apikey={key}'.format(
-                            href=rend['href'],
-                            join='&' if '?' in rend['href'] else '?',
-                            key=provider.get('config', {}).get('apikey'),
-                        )
-                    item['associations'][key] = assoc
+                            break  # binary is not available
+                    else:
+                        item['associations'][key] = assoc
 
         if item.get('pubstatus') == 'embargoed':
             item['pubstatus'] = PUB_STATUS.HOLD
