@@ -145,8 +145,7 @@ class OrangelogicSearchProvider(SearchProvider):
                 kwargs["token"] = self.token
                 with timer("orange.request"):
                     return self._request(api, **kwargs)
-            except HTTPError as err:
-                logger.error(err)
+            except HTTPError:
                 self._login()  # auth error
                 repeats -= 1
                 if repeats == 0:
