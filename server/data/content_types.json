@@ -312,7 +312,7 @@
     "priority": 0,
     "enabled": false,
     "is_used": true,
-    "init_version": 2,
+    "init_version": 3,
     "schema": {
         "subject": {
             "required": false,
@@ -397,6 +397,12 @@
             "required": false,
             "nullable": true,
             "type": "integer"
+        },
+        "filename": {
+            "required": false,
+            "nullable": true,
+            "enabled": true,
+            "type": "text"
         }
     },
     "editor": {
@@ -472,6 +478,11 @@
         "byline": {
             "required": false,
             "order": 8,
+            "section": "content"
+        },
+        "filename": {
+            "required": false,
+            "order": 2,
             "section": "content"
         }
     }

@@ -174,6 +174,8 @@ EDITOR = {
         "slugline": {"displayOnMediaEditor": True},
         "ednote": {"displayOnMediaEditor": True},
         "usageterms": {"order": 5, "displayOnMediaEditor": True},
+        "usageterms": {"order": 5, "displayOnMediaEditor": True},
+        "filename": {"order": 6, "displayOnMediaEditor": True},
     },
     "video": {
         "headline": {"order": 1, "sdWidth": "full"},
@@ -434,6 +436,6 @@ SEMAPHORE_CREATE_TAG_QUERY = os.getenv("SEMAPHORE_CREATE_TAG_QUERY")
 
 PICTURE_METADATA_UPDATE = {
     "slugline": "Title",
-    "extra.transref": "JobId",
+    "extra.filename": "JobId",
     "description_text": "Description",
 }
